@@ -1,0 +1,327 @@
+<!document html>
+<title>atari breakout</title>
+<canvas id="ctx" onclick= 'replay()' width="500" height="650" style="border:1px solid #190B07;bgcolor: solid #190B07 "></canvas>
+
+<script>  
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.font = '30px Arial'
+function replay(){
+if (gameover){
+location.href = 'atari breakout.html';
+} else {
+paused = !paused;
+}
+
+
+
+}
+
+// begin data
+var score = 0;
+var rij = 1;
+var paused = false; 
+var gameover = false;
+var nongameover = true;
+var breaksound = new Audio ();
+breaksound.src = 'breaksound.mp3'
+
+var planksound = new Audio () ;
+planksound.src = 'planksound.mp3'
+
+function breaksoundplay (){
+breaksound.play ();
+
+}
+function planksoundplay (){
+planksound.play();
+
+}
+
+function gameoversistem (){
+if (gameover) {
+paused = !paused;
+ctx.fillStyle = 'darkblue'
+ctx.fillRect (0,250,650,125);
+ctx.fillStyle ='red'
+ctx.fillText ('game over' , 190, 300);
+ctx.fillStyle ='white'
+ctx.fillText ('score = '+ score, 190,360);
+ctx.fillStyle = 'white'
+ctx.fillText ('tik om opnieuw te spelen',120,330);
+nongameover = false;
+
+}
+
+
+
+}
+function muispause (){          		//////nieuw
+
+if (plaat.x > 525){
+paused = !paused;
+}
+}
+
+
+//plank save
+var planklist = {}; 
+var id = 1
+function nieuwplanken () {
+
+
+plank (5,5,id);
+id += 1;
+plank (90,5,id);
+id += 1;
+plank (175,5,id);
+id += 1;
+plank (260,5,id);
+id += 1;
+plank (345,5,id);
+id += 1;
+plank (430,5,id);
+id += 1;
+
+};
+nieuwplanken ();
+
+
+function plank(x,y,id){
+var plank3 = {
+	x:x,
+	y:y,
+	id:id
+}
+planklist[id] = plank3;
+}
+//plankdraw
+function plankdraw (something){
+ctx.fillStyle = 'white'
+ctx.fillRect (something.x,something.y,80,30);
+};
+//bal nieuw
+var ballist = {};
+ballist1 (264,550,-1,-1,'b1')
+function ballist1 (x,y,xs,ys,id){
+var bal = {
+	x:x,
+	y:y,
+	xs:xs,
+	ys:ys,
+	id:id,
+}
+ballist [id] = bal
+}
+
+var plaat = {};
+var plaat ={
+x:200,
+y:600,
+}
+
+
+document.onmousemove = function(mouse){
+var muisx = mouse.clientX;
+
+plaat.x = muisx - 70
+
+}
+setInterval (start2,1)                //loooop
+function start2 (){
+if (paused) {
+
+ctx.fillStyle = 'darkblue'
+ctx.fillText ('pause' , 205, 275);
+
+} else {
+
+ctx.clearRect (0,0,500,650)
+ctx.fillStyle ='black'
+ctx.fillRect (0,0,500,650);
+ctx.fillStyle = 'darkred' 
+ctx.fillRect (0,500,650,5);	
+muispause();
+data ();
+for (var key in ballist){
+drawbal (ballist[key])
+
+
+var pl = plaat.x ;
+var pl1 = pl + 25;
+var pl2 = pl1 + 25;
+var pl3 = pl2 + 25;
+var pl4 = pl3 + 25;
+var pl5 = pl4 + 25;
+
+ctx.fillStyle = 'white'
+ctx.fillRect (pl,603,25,8);
+ctx.fillStyle = 'gray'
+ctx.fillRect (pl1,602,25,9);	
+ctx.fillStyle = 'white'
+ctx.fillRect (pl2,601,25,10);
+ctx.fillStyle = 'gray'
+ctx.fillRect (pl3,602,25,9);
+ctx.fillStyle = 'white'
+ctx.fillRect (pl4,603,25,8);
+
+if (ballist[key].y < 611){
+
+	if (ballist[key].x > pl && ballist[key].x < pl1 && ballist[key].y > 601) {
+	ballist[key].xs = -1;
+	ballist[key].ys = -1;
+	planksoundplay ();
+	}
+
+	if (ballist[key].x > pl1 && ballist[key].x < pl2 && ballist[key].y > 602) {
+	ballist[key].xs = -1;
+	ballist[key].ys = -1;
+	planksoundplay ();
+	}
+
+	if (ballist[key].x > pl2 && ballist[key].x < pl3 && ballist[key].y > 603) {
+	ballist[key].ys = - ballist[key].ys;
+	planksoundplay ();
+	}
+
+
+	if (ballist[key].x > pl3 && ballist[key].x < pl4 && ballist[key].y > 602) {
+	ballist[key].xs = 1;
+	ballist[key].ys = -1;
+	planksoundplay ();
+	}
+
+		
+	if (ballist[key].x > pl4 && ballist[key].x < pl5 && ballist[key].y > 601) {
+	ballist[key].xs = 1;
+	ballist[key].ys = -1;
+	planksoundplay ();
+	}
+}
+if (ballist[key].y < 650){}else {gameover = true}
+
+}
+planktest (ballist[key]);
+
+
+function blokdel (blok) {
+ delete blok;
+
+
+}
+////////// blok breek sistem /////////
+function planktest (balletje){
+for (var key in planklist) {
+plankdraw (planklist[key])
+var x1 = planklist[key].x + 80;
+
+var y1 = planklist[key].y + 30;    
+
+var x  = planklist[key].x;
+var y  = planklist[key].y;
+if (y1 > 500){
+delete planklist[key]
+gameover = true
+}
+
+if (balletje.x > x && balletje.x < x1 && balletje.y === y1 ){
+
+balletje.ys = -balletje.ys;
+
+breaksoundplay ();
+delete planklist[key];
+score +=1;
+}
+if (balletje.x > x && balletje.x < x1 && balletje.y === y ){
+
+balletje.ys = -balletje.ys;
+
+breaksoundplay ();
+
+delete planklist[key];
+score +=1;
+}
+if (balletje.y > y && balletje.y < y1 && balletje.x === x){
+
+balletje.xs = -balletje.xs;
+
+breaksoundplay ();
+delete planklist[key];
+score +=1;
+}
+if (balletje.y > y && balletje.y < y1 && balletje.x === x1){
+
+balletje.xs = -balletje.xs;
+
+
+breaksoundplay ();
+delete planklist[key];
+score +=1;
+}
+ gameoversistem  ();
+}};
+//teken bal
+function drawbal (lob){
+ctx.fillStyle = 'white'
+ctx.fillRect (lob.x,lob.y,3,3);
+lob.x += lob.xs;
+lob.y += lob.ys;
+if (lob.x < 0 || lob.x > 500){
+lob.xs = -lob.xs;
+
+}
+if (lob.y < 0 ){
+lob.ys = -lob.ys;
+
+}
+}
+
+data ();
+}}
+
+setInterval (plankmove,19000);
+function plankmove ()   {
+if (nongameover){
+if (paused){} else {
+for (var key in planklist){
+
+planklist[key].y  += 35;
+
+}
+nieuwplanken ();
+rij += 1;
+}}}
+
+//snelheid data
+var snelheid1 = true;
+var snelheid2 = true;
+var snelheid3 = true;
+var snelheid4 = true;
+
+//data
+function data () {
+ctx.fillStyle = 'red'
+ctx.fillText ('score ='+score,15,25)
+ctx.fillText ('rij ='+rij,15,50);
+if (score > 50 && snelheid1 && score < 100){
+setInterval (plankmove,18000);
+snelheid1 = false;
+
+}
+if (score > 100 && snelheid2 && score < 150){
+setInterval (plankmove,17700);
+snelheid2 = false;
+
+}
+if (score > 150 && snelheid3 && score < 200){
+setInterval (plankmove,12500);
+snelheid3 = false;
+
+}
+if (score > 200 && snelheid4){
+setInterval (plankmove,11000);
+snelheid4 = false;
+
+}
+}
+
+</script>
