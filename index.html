@@ -1,327 +1,797 @@
-<!document html>
-<title>atari breakout</title>
-<canvas id="ctx" onclick= 'replay()' width="500" height="650" style="border:1px solid #190B07;bgcolor: solid #190B07 "></canvas>
-
-<script>  
-var ctx = document.getElementById("ctx").getContext("2d");
-ctx.font = '30px Arial'
-function replay(){
-if (gameover){
-location.href = 'https://kevinveld2001.github.io/atari-breakout/';
-} else {
-paused = !paused;
-}
-
-
-
-}
-
-// begin data
-var score = 0;
-var rij = 1;
-var paused = false; 
-var gameover = false;
-var nongameover = true;
-var breaksound = new Audio ();
-breaksound.src = '/breaksound.mp3'
-
-var planksound = new Audio () ;
-planksound.src = '/planksound.mp3'
-
-function breaksoundplay (){
-breaksound.play ();
-
-}
-function planksoundplay (){
-planksound.play();
-
-}
-
-function gameoversistem (){
-if (gameover) {
-paused = !paused;
-ctx.fillStyle = 'darkblue'
-ctx.fillRect (0,250,650,125);
-ctx.fillStyle ='red'
-ctx.fillText ('game over' , 190, 300);
-ctx.fillStyle ='white'
-ctx.fillText ('score = '+ score, 190,360);
-ctx.fillStyle = 'white'
-ctx.fillText ('tik om opnieuw te spelen',120,330);
-nongameover = false;
-
-}
-
-
-
-}
-function muispause (){          		//////nieuw
-
-if (plaat.x > 525){
-paused = !paused;
-}
-}
-
-
-//plank save
-var planklist = {}; 
-var id = 1
-function nieuwplanken () {
-
-
-plank (5,5,id);
-id += 1;
-plank (90,5,id);
-id += 1;
-plank (175,5,id);
-id += 1;
-plank (260,5,id);
-id += 1;
-plank (345,5,id);
-id += 1;
-plank (430,5,id);
-id += 1;
-
-};
-nieuwplanken ();
-
-
-function plank(x,y,id){
-var plank3 = {
-	x:x,
-	y:y,
-	id:id
-}
-planklist[id] = plank3;
-}
-//plankdraw
-function plankdraw (something){
-ctx.fillStyle = 'white'
-ctx.fillRect (something.x,something.y,80,30);
-};
-//bal nieuw
-var ballist = {};
-ballist1 (264,550,-1,-1,'b1')
-function ballist1 (x,y,xs,ys,id){
-var bal = {
-	x:x,
-	y:y,
-	xs:xs,
-	ys:ys,
-	id:id,
-}
-ballist [id] = bal
-}
-
-var plaat = {};
-var plaat ={
-x:200,
-y:600,
-}
-
-
-document.onmousemove = function(mouse){
-var muisx = mouse.clientX;
-
-plaat.x = muisx - 70
-
-}
-setInterval (start2,1)                //loooop
-function start2 (){
-if (paused) {
-
-ctx.fillStyle = 'darkblue'
-ctx.fillText ('pause' , 205, 275);
-
-} else {
-
-ctx.clearRect (0,0,500,650)
-ctx.fillStyle ='black'
-ctx.fillRect (0,0,500,650);
-ctx.fillStyle = 'darkred' 
-ctx.fillRect (0,500,650,5);	
-muispause();
-data ();
-for (var key in ballist){
-drawbal (ballist[key])
-
-
-var pl = plaat.x ;
-var pl1 = pl + 25;
-var pl2 = pl1 + 25;
-var pl3 = pl2 + 25;
-var pl4 = pl3 + 25;
-var pl5 = pl4 + 25;
-
-ctx.fillStyle = 'white'
-ctx.fillRect (pl,603,25,8);
-ctx.fillStyle = 'gray'
-ctx.fillRect (pl1,602,25,9);	
-ctx.fillStyle = 'white'
-ctx.fillRect (pl2,601,25,10);
-ctx.fillStyle = 'gray'
-ctx.fillRect (pl3,602,25,9);
-ctx.fillStyle = 'white'
-ctx.fillRect (pl4,603,25,8);
-
-if (ballist[key].y < 611){
-
-	if (ballist[key].x > pl && ballist[key].x < pl1 && ballist[key].y > 601) {
-	ballist[key].xs = -1;
-	ballist[key].ys = -1;
-	planksoundplay ();
-	}
-
-	if (ballist[key].x > pl1 && ballist[key].x < pl2 && ballist[key].y > 602) {
-	ballist[key].xs = -1;
-	ballist[key].ys = -1;
-	planksoundplay ();
-	}
-
-	if (ballist[key].x > pl2 && ballist[key].x < pl3 && ballist[key].y > 603) {
-	ballist[key].ys = - ballist[key].ys;
-	planksoundplay ();
-	}
-
-
-	if (ballist[key].x > pl3 && ballist[key].x < pl4 && ballist[key].y > 602) {
-	ballist[key].xs = 1;
-	ballist[key].ys = -1;
-	planksoundplay ();
-	}
-
-		
-	if (ballist[key].x > pl4 && ballist[key].x < pl5 && ballist[key].y > 601) {
-	ballist[key].xs = 1;
-	ballist[key].ys = -1;
-	planksoundplay ();
-	}
-}
-if (ballist[key].y < 650){}else {gameover = true}
-
-}
-planktest (ballist[key]);
-
-
-function blokdel (blok) {
- delete blok;
-
-
-}
-////////// blok breek sistem /////////
-function planktest (balletje){
-for (var key in planklist) {
-plankdraw (planklist[key])
-var x1 = planklist[key].x + 80;
-
-var y1 = planklist[key].y + 30;    
-
-var x  = planklist[key].x;
-var y  = planklist[key].y;
-if (y1 > 500){
-delete planklist[key]
-gameover = true
-}
-
-if (balletje.x > x && balletje.x < x1 && balletje.y === y1 ){
-
-balletje.ys = -balletje.ys;
-
-breaksoundplay ();
-delete planklist[key];
-score +=1;
-}
-if (balletje.x > x && balletje.x < x1 && balletje.y === y ){
-
-balletje.ys = -balletje.ys;
-
-breaksoundplay ();
-
-delete planklist[key];
-score +=1;
-}
-if (balletje.y > y && balletje.y < y1 && balletje.x === x){
-
-balletje.xs = -balletje.xs;
-
-breaksoundplay ();
-delete planklist[key];
-score +=1;
-}
-if (balletje.y > y && balletje.y < y1 && balletje.x === x1){
-
-balletje.xs = -balletje.xs;
-
-
-breaksoundplay ();
-delete planklist[key];
-score +=1;
-}
- gameoversistem  ();
-}};
-//teken bal
-function drawbal (lob){
-ctx.fillStyle = 'white'
-ctx.fillRect (lob.x,lob.y,3,3);
-lob.x += lob.xs;
-lob.y += lob.ys;
-if (lob.x < 0 || lob.x > 500){
-lob.xs = -lob.xs;
-
-}
-if (lob.y < 0 ){
-lob.ys = -lob.ys;
-
-}
-}
-
-data ();
-}}
-
-setInterval (plankmove,19000);
-function plankmove ()   {
-if (nongameover){
-if (paused){} else {
-for (var key in planklist){
-
-planklist[key].y  += 35;
-
-}
-nieuwplanken ();
-rij += 1;
-}}}
-
-//snelheid data
-var snelheid1 = true;
-var snelheid2 = true;
-var snelheid3 = true;
-var snelheid4 = true;
-
-//data
-function data () {
-ctx.fillStyle = 'red'
-ctx.fillText ('score ='+score,15,25)
-ctx.fillText ('rij ='+rij,15,50);
-if (score > 50 && snelheid1 && score < 100){
-setInterval (plankmove,18000);
-snelheid1 = false;
-
-}
-if (score > 100 && snelheid2 && score < 150){
-setInterval (plankmove,17700);
-snelheid2 = false;
-
-}
-if (score > 150 && snelheid3 && score < 200){
-setInterval (plankmove,12500);
-snelheid3 = false;
-
-}
-if (score > 200 && snelheid4){
-setInterval (plankmove,11000);
-snelheid4 = false;
-
-}
-}
-
-</script>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>opleiding</title>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+        crossorigin="anonymous">
+        <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5">
+</head>
+
+<body>
+
+    <canvas id="ctx"></canvas>
+    <div id="particles-js"></div>
+    <h1 class="disclaimer">disclaimer: Ik heb dyslectie!<br>Er kunnen spellingsfouten<br> in de text zitten</h1>
+    <div class="sidebar">
+        <div class="centerer">
+            <div class="nav">
+                <div class="divdevider">
+                <a href="javascript:navclick('nav1');" onclick="navclick('nav1')">
+                    <div id="nav1" class="nav1">home</div>
+                </a>
+                </div>
+                <div class="divdevider">
+                <a href="javascript:navclick('nav2');" onclick="navclick('nav2')">
+                    <div id="nav2" class="nav2">opleiding</div>
+                </a>
+                </div>
+                    <div id="subbar1" class="subbar">
+                       <a href="javascript:navclick('asub1');"><li>inleiding</li></a> 
+                       <a href="javascript:navclick('asub2');"><li>locatie</li></a> 
+                       <a href="javascript:navclick('asub3');"><li>wat is het</li></a> 
+                        <a href="javascript:navclick('asub4');"><li>wat leer je</li></a> 
+                       <a href="javascript:navclick('asub5');"><li>wat kun je er mee doen</li></a><br> 
+                    </div>
+                <div class="divdevider">
+                <a href="javascript:navclick('nav3');" onclick="navclick('nav3')">
+                    <div id="nav3" class="nav3">erachter komen</div>
+                </a>
+                </div>
+                    <div id="subbar2" class="subbar">
+                        <a href="javascript:navclick('bsub1');"><li>inleiding</li></a> 
+                        <a href="javascript:navclick('bsub2');"><li>ervaring</li></a> 
+                        <a href="javascript:navclick('bsub3');"><li>meekijkdag</li></a> 
+                         <a href="javascript:navclick('bsub4');"><li>stage</li></a> 
+                        
+                     </div>
+                <div class="divdevider">
+                <a href="javascript:navclick('nav4');" onclick="navclick('nav4')">
+                    <div id="nav4" class="nav4">mijn projecten</div>
+                </a>
+                </div>
+                <div id="subbar3" class="subbar">
+                        <a href="javascript:navclick('csub1');"><li>inleiding</li></a> 
+                        <a href="javascript:navclick('csub2');"><li>atari-breakout</li></a> 
+                        <a href="javascript:navclick('csub3');"><li>fireworks</li></a> 
+                         <a href="javascript:navclick('csub4');"><li>mobile app</li></a> 
+                     </div>
+           
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="main">
+        <div id="landing"class="landing">
+            <h1 id="nav1title" class="titletext">De opleiding die ik ga doen</h1>
+            <p class="text">Op deze website wil ik het gaan hebben over de vervolgopleiding die ik wil gaan doen.
+                 Ook kom je iets te weeten over warom ik het wil doen en de hobby's die ik heb.</p>
+        </div>
+        <a href="javascript:mainscroll()">
+
+            <div class="scroll">
+                <div class="scrollclick">
+                </div>
+                <i class="fas fa-chevron-down scrollcolor "></i>
+            </div>
+        </a>
+        <div id="maintext"class="alltext">
+            <h1 id="nav2title" class="titletext">opleiding</h1>
+            <p class="text">
+                Ik heb me ingeschreeven voor de opleiding applicatie en media ontwikkelaar op het ROC Hengelo.
+                 De school ROC Hengelo heeft ook de bijnaam "Gieterij".
+            </p><br>
+            <h1 id="asub2" class="text">locatie</h1>
+            <p>
+                De school is in hengelo. vroeger was het een gieterij dus daar komt de naam ook vandaan.
+                 Ze geven daar veel opleidingen ik doe applicatie en media ontwikkelaar.
+               Als ik daar straks naar school to ga kan ik gewoon met de trein. 
+               Dan de straat oversteeken en uitloopen dan ben ik er al. 
+               Hieronder heb ik een kaart met daarop de locatie van de school.
+            </p>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2442.0586684133723!2d6.784365015681914!3d52.260479663182075!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47b80e02905554d3%3A0x2862a3d5ebd1ab56!2sROC+van+Twente+-+De+Gieterij!5e0!3m2!1sen!2snl!4v1547541685258"
+                width="500" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+            <h1 id="asub3" class="text">wat is het</h1>
+            <p>
+                Voor de mensen die niet weeten wat een applicatie en media ontwikkelaar doet. 
+                Ik gaat het je uitleggen.
+                 Een applicatie en media ontwikkelaar maakt website's en app's doormidel van programeer taal. 
+                 Hierbij gaat het dus niet over de avbeeldingen of de text maar meer over de functies van de app of website. 
+                 Denk bijvoorbeeld aan de livestream functie in instagam.
+                  Er moet video worden opgenomen, die moet naar een server en dan naar de gebruiker die het wil zien.
+                   Dit klinkt simpel maar daar zit veel tijd in. daar zijn applicatie en media ontwikkelaar's voor nodig. 
+                   Als het nog niet duidedelijk is waat ze doen dan heb ik ook nog een filmpje voor jou.
+
+            </p>
+            <iframe width="500" height="450" src="https://www.youtube.com/embed/otaqEA0fF9o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <h1 id="asub4"class="text">wat leer je er</h1>
+            <p>
+                Ik ben naar oppendagen geweest en daar ook de vraag gesteld: 'wat leer je hier?'. 
+                Je leert er natuurlijk de bassis vakken. daarnaast leer je ook programeeren.
+                eerst begin je met zoiets als scetch om de smaak tepakken te krijgen.
+                daarna html css js als je dat kunt ga je door met php en dan als laatste c#.
+               
+            </p>
+            <br>
+            <h1 id="asub5" class="text">wat kun je er mee</h1>
+            <p>
+               Met deze opleiding kun je later website's en app's maken. Dit wordt steets belangrijker.
+                Veel bedrijfen hebben website's of app's nodig. maar er zijn ook mensen die denken dat software banen gaat overneemen.
+                De laatste jaren is dit ook een beetje het gefal geweest.
+                 netflix heeft de bioscoop vervangen, booking.nl heeft het reisburo overgonomen en bol.com de winkel's.
+
+                 laater kan dit nog veel erger worden. hier is een artikel over de verwachtingen van de toekomst.
+            </p>
+            <a style="color:aliceblue"href="https://www.computerhope.com/issues/ch001799.htm">www.computerhope.com</a>
+            <p>
+                Dit is waarom het maken van software nog belangrijker kan worden dat dat het al is.
+            </p><br><p>
+                Ik heb hier ook zelf een voorbeeld voor. Omdat ik dyslectisch ben download/scan ik al mijn boeken (zodat ik ze kan laten voorlezen).
+                Een hooftstuk kan wel een half uur duuren. daarom heb ik er een stukje software geschreven die het voor mij kan doen.
+                Ik type in welke bladzijdes ik wil en van welk boek en na 5 seconden zijn alle bladzijdes gedownload.
+            </p>
+
+
+            <br>
+            <h1 id="nav3title" class="titletext">hoe ben ik erachter gekomen</h1>
+            <p>
+                in dit hooftstuk ga ik het heben over hoe ik erachter ben gekomen dat ik deze opleiding wil doen.
+
+
+            </p>
+
+            <h1 id="bsub2" class="text">ervaring</h1>
+            <p>
+               Ik heb al wat ervaring opgedaan over programeeren.
+               Ik heb wat kleine projectjes gedaan, tutorials gekeken en dingen opgezocht op het internet.
+               Later geef ik hier voorbeelden voor. 
+            </p>
+
+            <h1 id="bsub3" class="text">meekijkdag</h1>
+            <p>
+                Ik heb een meeloopdag gelopen op het roc almelo. Ik kon er meekijken met wat de leerlingen daar deden. 
+                Ook heben we uitleg over programeeren gehad met als afsluiter een quiz.
+            </p>
+
+            <h1 id="bsub4"class="text">stage</h1>
+            <p>
+
+              Ik heb stage geloopen bij het bedrijf brandcube. daar maken ze website's met spesiale functies.
+              Daar ben ik 2 dagen meegelopen om een beeld van het beroep te krijgen. 
+              Ook heb ik de opdragt gekreegen om zelf een website te bouwen.
+              Ik heb daar een muziek player gemaakt. 
+              bij de muziek player zit een draaiende plaat dat was het moeilijke gedeelte omdat je dat een animatie moet geven.
+              eerst draaide de plaat heen en weer maar niet rond. het is uiteindelijk gelukt.
+                neem zelf ook een kijkje
+            </p>
+            <a href="https://kevinveld2001.github.io/player/"><button class="playerbtn">ga naar de website</button></a>
+            <a href="https://github.com/kevinveld2001/player"><button class="playerbtn">zie de code van de site</button></a>
+            <br>
+            
+          
+
+
+            <br>
+            <h1 id="nav4title" class="titletext">mijn projecten</h1>
+            <p>
+                Ik heb mezelf al wat leeren programmeren. Om dit te doen heb ik wat moeten oefenen. 
+                In dit hooftstuk ga ik het hebben over de projecten die ik openbaar heb gemaakt.
+                ik heb wat kleinere projecten op github.com gezet. 
+                Dit zijn kleine projecten omdat die ook af zijn en je ze dan rechtstreeks via github kunt zien.
+                voor grootere projecten gebruik ik speciale software dus anderen kunnen het dan niet uit proberen.
+
+            </p>
+
+            <h1 id="csub2" class="text">atari-breakout</h1>
+            <p>      
+                  mijn eerste project met javascript is een namaak van atari breakout. 
+               Dit heeft 3 dagen geduurt om te leeren hoe het moet en het maken zelf.
+               het is niet de beste
+                <br>
+                <a href="https://kevinveld2001.github.io/atari-breakout/"><button class="playerbtn">ga naar de website</button></a>
+                <a href="https://github.com/kevinveld2001/atari-breakout"><button class="playerbtn">zie de code van de site</button></a>
+
+               
+            </p>
+
+            <h1 id="csub3" class="text">fireworks-particle</h1>
+            <p>
+                    Net na niewjaar heb ik een fireworks-particle simulatie gemaakt. 
+                    Ik was geinspireert door het fuurwerk om dit te programeeren.
+                    Het moeilijke hieraan was om de puntjes te perekenen en het erop laten lijken dat er zwaartekracht is.
+    <br>
+                    <a href="https://kevinveld2001.github.io/fireworks-particle/index.html"><button class="playerbtn">ga naar de website</button></a>
+                    <a href="https://github.com/kevinveld2001/fireworks-particle"><button class="playerbtn">zie de code van de site</button></a>
+            </p>
+
+            <h1 id="csub4"class="text">mobile app</h1>
+            <p>
+
+               Ik heb ook een moblie app gemaakt.
+               hiervoor heb ik heb ik react native gebruikt.
+               ik kan hievoor niet meer laten zien dan een foto omdat, als ik het in de app/play store wil zetten kost het geld.
+                Dat is warom ik er een foto van laat zien
+                <br>
+                <img src="https://github.com/kevinveld2001/atari-breakout/blob/gh-pages/Screenshot_20190212-094044_myfirstapp.jpg?raw=true" alt="app">
+            </p>
+            <br>
+    
+
+        </div>
+
+    </div>
+
+
+
+
+    <style>
+        .disclaimer{
+            position: absolute;
+            right: 10px;
+            top:10px;
+            color:red;
+            z-index: 20;
+            font-size: 16px;
+
+
+        }
+        .playerbtn{
+            background-color: #5b94ef;
+            color:azure;
+            width:120px;
+            height:50px;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px;
+
+        }
+        .playerbtn:hover{
+            background-color: #486697
+        }
+        .subbar{
+            position: relative;
+            left:10px;
+            color:white;
+            height:100px;
+            padding-top:1px;
+        }
+        .subbar li{
+            color:white;
+            padding:1px;
+            font-size: 12px;
+            padding-left:20px;
+            font-family: "Comic Sans MS", sans-serif;
+            
+        }
+        .divdevider{
+            position: relative;
+            height: 40px;
+            width:auto;
+            padding-top: 1px;
+        }
+        .alltext {
+            position: absolute;
+            left: 50px;
+            top: calc(100px + 100%);
+            width: 40%;
+        }
+        .moballtext {
+            position: absolute;
+            left: 50px;
+            top: calc(100px + 100%);
+            width: 80%;
+        }
+
+        .scroll {
+            position: absolute;
+            left: 30%;
+            bottom: 20px;
+            animation: mymove 1s infinite;
+        }
+
+        .scroll:hover {
+            animation: null
+        }
+
+        .scrollcolor {
+            color: aliceblue
+        }
+
+        .landing {
+            position: absolute;
+            left: 50px;
+            top: 100px;
+            width: 40%;
+        }
+        
+        .moblanding {
+            position: absolute;
+            left: 50px;
+            top: 100px;
+            width: 80%;
+        }
+
+        .text {
+            color: aliceblue;
+            font-size: 20px;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .titletext {
+            color: aliceblue;
+            font-size: 40px;
+            font-family: "Comic Sans MS", sans-serif;
+
+        }
+
+        p {
+            color: aliceblue;
+            font-size: 20px;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .nav1 {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            color: aliceblue;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .nav1:hover {
+            border-bottom: 2px solid aliceblue
+        }
+
+        .nav2 {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            color: aliceblue;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .nav2:hover {
+            border-bottom: 2px solid aliceblue
+        }
+
+        .nav3 {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            color: aliceblue;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .nav3:hover {
+            border-bottom: 2px solid aliceblue
+        }
+
+        .nav4 {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            color: aliceblue;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .nav4:hover {
+            border-bottom: 2px solid aliceblue
+        }
+
+        .nav5 {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            color: aliceblue;
+            font-family: "Comic Sans MS", sans-serif;
+        }
+
+        .nav5:hover {
+            border-bottom: 2px solid aliceblue
+        }
+
+        .centerer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        .nav {
+            position: absolute;
+            width: 130px;
+            height: 300px;
+            top: -150px;
+            left: -50px;
+
+        }
+
+        #particles-js {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ctx {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 30%;
+            height: 100%;
+        }
+
+        .main {
+            position: absolute;
+            top: 0px;
+            left: 30%;
+            width: 70%;
+            height: 100%;
+        }
+
+
+        .box {
+            border: 2px solid aliceblue
+        }
+
+        body {
+            background-color: #323738;
+            overflow-x: hidden;
+
+        }
+
+        .scrollclick {
+            position: absolute;
+            left: -100px;
+            top: -100px;
+            width: 200px;
+            height: 200px;
+
+        }
+
+        @keyframes mymove {
+            from {
+                bottom: 40px;
+            }
+
+            to {
+                bottom: 20px;
+            }
+        }
+    </style>
+    <script>
+        var scrolltopos = null
+        
+
+
+    
+
+
+
+
+
+
+
+        function navclick(data) {
+            scrolltopos = null
+            godown = false
+            goup = false
+             if (scrolltopos === null) {
+
+                if (data === 'nav1') {
+                    // window.scrollTo(0, 0);
+                    scrolltopos = 1
+                }
+                if (data === 'nav2') {
+                    // window.scrollTo(0, window.innerHeight);
+                    scrolltopos = window.innerHeight
+                }
+                if (data === 'nav3') {
+                    // window.scrollTo(0, window.innerHeight + document.getElementById("nav3title").offsetTop);
+                    scrolltopos = window.innerHeight + document.getElementById("nav3title").offsetTop
+                }
+                if (data === 'nav4') {
+                    // window.scrollTo(0, window.innerHeight + document.getElementById("nav4title").offsetTop);
+                    scrolltopos = window.innerHeight + document.getElementById("nav4title").offsetTop
+                }
+                
+                if (data === "asub1"){
+                    scrolltopos = window.innerHeight + document.getElementById("nav2title").offsetTop
+                }
+                if (data === "asub2"){
+                    scrolltopos = window.innerHeight + document.getElementById("asub2").offsetTop
+                }
+                if (data === "asub3"){
+                    scrolltopos = window.innerHeight + document.getElementById("asub3").offsetTop
+                }
+                if (data === "asub4"){
+                    scrolltopos = window.innerHeight + document.getElementById("asub4").offsetTop
+                }
+                if (data === "asub5"){
+                    scrolltopos = window.innerHeight + document.getElementById("asub5").offsetTop
+                }
+                if (data === "bsub1"){
+                    scrolltopos = window.innerHeight + document.getElementById("nav3title").offsetTop
+                }
+                if (data === "bsub2"){
+                    scrolltopos = window.innerHeight + document.getElementById("bsub2").offsetTop
+                }
+                if (data === "bsub3"){
+                    scrolltopos = window.innerHeight + document.getElementById("bsub3").offsetTop
+                }
+                if (data === "bsub4"){
+                    scrolltopos = window.innerHeight + document.getElementById("bsub4").offsetTop
+                }
+                if (data === "bsub5"){
+                    scrolltopos = window.innerHeight + document.getElementById("bsub5").offsetTop
+                }
+                if (data === "csub1"){
+                    scrolltopos = window.innerHeight + document.getElementById("nav4title").offsetTop
+                }
+                if (data === "csub2"){
+                    scrolltopos = window.innerHeight + document.getElementById("csub2").offsetTop
+                }
+                if (data === "csub3"){
+                    scrolltopos = window.innerHeight + document.getElementById("csub3").offsetTop
+                }
+                if (data === "csub4"){
+                    scrolltopos = window.innerHeight + document.getElementById("csub4").offsetTop
+                }
+                if (data === "csub5"){
+                    scrolltopos = window.innerHeight + document.getElementById("csub5").offsetTop
+                }
+
+            }
+        }
+        
+        function hidesub (){
+           document.getElementById("subbar1").style.display = "none"
+           document.getElementById("subbar2").style.display = "none"
+           document.getElementById("subbar3").style.display = "none"
+          
+        }
+        setInterval(function () {
+
+
+           if (window.pageYOffset > document.getElementById("nav4title").offsetTop) {
+                var data = "nav4"
+                document.getElementById("nav1").classList.remove("box");
+                document.getElementById("nav2").classList.remove("box");
+                document.getElementById("nav3").classList.remove("box");
+                document.getElementById("nav4").classList.remove("box");
+                
+                document.getElementById(data).classList.add("box");
+                hidesub()
+                document.getElementById("subbar3").style.display = "block"
+
+            } else if (window.pageYOffset > document.getElementById("nav3title").offsetTop) {
+                var data = "nav3"
+                document.getElementById("nav1").classList.remove("box");
+                document.getElementById("nav2").classList.remove("box");
+                document.getElementById("nav3").classList.remove("box");
+                document.getElementById("nav4").classList.remove("box");
+                
+                document.getElementById(data).classList.add("box");
+                hidesub()
+                document.getElementById("subbar2").style.display = "block"
+
+            } else if (window.pageYOffset > document.getElementById("nav2title").offsetTop) {
+                var data = "nav2"
+                document.getElementById("nav1").classList.remove("box");
+                document.getElementById("nav2").classList.remove("box");
+                document.getElementById("nav3").classList.remove("box");
+                document.getElementById("nav4").classList.remove("box");
+           
+                document.getElementById(data).classList.add("box");
+                hidesub()
+                document.getElementById("subbar1").style.display = "block"
+
+            } else {
+                var data = "nav1"
+                document.getElementById("nav1").classList.remove("box");
+                document.getElementById("nav2").classList.remove("box");
+                document.getElementById("nav3").classList.remove("box");
+                document.getElementById("nav4").classList.remove("box");
+          
+                document.getElementById(data).classList.add("box");
+                hidesub()
+
+            }
+
+
+
+
+            if (window.innerHeight > window.innerWidth){
+                document.getElementById("maintext").classList.add("moballtext");
+                
+                document.getElementById("landing").classList.add("moblanding");
+            }else{
+                document.getElementById("maintext").classList.remove("moballtext");
+                document.getElementById("landing").classList.remove("moblanding");
+            }
+
+
+
+
+
+
+
+        }, 100)
+
+        function mainscroll() {
+
+
+            // window.scrollTo(0, window.innerHeight);
+            scrolltopos = window.innerHeight
+        }
+
+
+
+
+        setInterval(superscroll, 1)
+        var godown = false
+        var goup = false
+
+        function superscroll() {
+            for (a= 0 ; a < 100 ; a++){
+            if (scrolltopos === null) {
+
+            } else {
+                if (goup) {
+                    if (scrolltopos > window.pageYOffset) {
+                        scrolltopos = null
+                        goup = false
+                    }
+
+                } else if (godown) {
+                    if (scrolltopos < window.pageYOffset) {
+                        scrolltopos = null
+                        godown = false
+                    }
+
+                }
+                 if(scrolltopos === Math.round(window.pageYOffset)){
+                    scrolltopos = null
+                    godown = false
+                    goup = false
+                }
+
+
+
+                if (scrolltopos > window.pageYOffset) {
+                    window.scrollBy(0, 1)
+                    console.log("down")
+                    godown = true
+                } else if (scrolltopos < window.pageYOffset) {
+                    window.scrollBy(0, -1)
+                    console.log("up")
+                    goup = true
+                }
+
+
+
+            }
+
+
+
+
+
+            }
+        }
+
+
+        //canvas
+        var scroll = 0
+        var lastscroll = window.pageYOffset
+        var list = []
+        var ctx = document.getElementById("ctx").getContext('2d');
+        setInterval(function () {
+            document.getElementById("ctx").width = window.innerWidth;
+            document.getElementById("ctx").height = window.innerHeight;
+            ctx.fillStyle = "#323738";
+
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+            draw()
+            scroll = scroll - (scroll / 5)
+            if (lastscroll > window.pageYOffset) {
+                scroll -= 5
+            }
+            if (lastscroll < window.pageYOffset) {
+                scroll += 5
+            }
+            lastscroll = window.pageYOffset
+        }, 50)
+
+
+
+        function draw() {
+
+            for (a = 0; a < list.length; a++) {
+
+
+                ctx.fillStyle = "#c6c9ce"
+
+                ctx.beginPath();
+                ctx.moveTo(list[a].x, list[a].y);
+                ctx.arc(list[a].x, list[a].y, list[a].s, 0, Math.PI * 2, true);
+                ctx.fill();
+                ctx.closePath();
+
+                list[a].x += list[a].mx
+                list[a].y += list[a].my - scroll
+
+
+                if (list[a].x > window.innerWidth) {
+                    list[a].x = 0
+                }
+                if (list[a].x < 0) {
+                    list[a].x = window.innerwidth
+                }
+
+                if (list[a].y > window.innerHeight) {
+                    list[a].y = 0
+                }
+                if (list[a].y < 0) {
+                    list[a].y = window.innerHeight
+                }
+
+            }
+
+        }
+
+
+        make(40)
+
+        function make(i) {
+            for (a = 0; a < i; a++) {
+                var dot = {
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    mx: (Math.random() - 0.5) * 6,
+                    my: (Math.random() - 0.5) * 6,
+                    s: Math.random() * 5,
+                }
+
+                list.push(dot)
+            }
+
+        }
+    </script>
+
+</body>
+
+</html>
